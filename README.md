@@ -9,12 +9,12 @@ A real-time multiplayer Connect4 game built with React.js frontend and Node.js b
 - **Live Leaderboard**: Track top 5 players with real-time updates
 - **Modern UI**: Dark theme with responsive design and smooth animations
 - **Game Rules**: Built-in tutorial explaining how to win (4 in a row: horizontal, vertical, diagonal)
-- **Analytics**: Game events tracked via Kafka for performance monitoring
+- **Analytics**: Game events tracked via Kafka for performance monitoring (local development)
 
 ## 🚀 Live Demo
 
-🌐 **Frontend URL**: [Your Frontend URL Here]
-🌐 **Backend API**: [Your Backend URL Here]
+🌐 **Frontend URL**: https://4in-row-game-or-connect4-itwkty1xo.vercel.app/
+🌐 **Backend API**: https://connect4-backend-ka4c.onrender.com
 
 ## 📁 Project Structure
 
@@ -29,7 +29,7 @@ connect4-game/
 │   ├── bot/                  # Bot logic
 │   ├── analytics/            # Analytics consumer
 │   └── utils/                # Utility functions
-├── connect4-frontend2/        # React.js Frontend
+├── connect4-frontend/         # React.js Frontend
 │   ├── src/
 │   │   ├── components/       # React components
 │   │   │   ├── Landing.jsx   # Home page
@@ -73,7 +73,7 @@ Before running this application, make sure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone [your-github-repo-url]
+git clone https://github.com/AnshulMishra2003/4inRowGame-or-Connect4.git
 cd connect4-game
 ```
 
@@ -120,13 +120,13 @@ The backend will run on `http://localhost:5000`
 ### 3. Frontend Setup
 
 ```bash
-cd ../connect4-frontend2
+cd ../connect4-frontend
 
 # Install dependencies
 npm install
 
 # Update socket connection in src/socket.js if needed
-# const socket = io("http://localhost:5000");
+# const socket = io("https://connect4-backend-ka4c.onrender.com");
 
 # Start the frontend development server
 npm start
@@ -179,6 +179,72 @@ The frontend will run on `http://localhost:3000`
 1. **Build Command**: `npm run build`
 2. **Publish Directory**: `build`
 3. **Environment Variables**: Update socket URL to your deployed backend
+
+## 🔄 Bonus – Kafka Integration for Analytics
+
+Simulate a real-world production use case by implementing **decoupled game analytics** using **Kafka**.
+
+> **Note**: Kafka integration is currently configured for local development only and is not deployed to production.
+
+### Features
+
+The Kafka analytics system provides comprehensive game monitoring through:
+
+### Kafka Producer (Game Service)
+- Publishes game events to Kafka topics in real-time
+- Tracks key gameplay events:
+  - Game start/end events
+  - Player moves and game state changes
+  - Win/draw/disconnect events
+  - User session data
+
+### Kafka Consumer (Analytics Service)
+
+Build a simple Kafka consumer that:
+
+- **Event Logging**: Logs all game events or stores them in a database
+- **Gameplay Metrics Tracking**:
+  - Average game duration
+  - Most frequent winners
+  - Games per day/hour
+  - Peak playing hours
+- **User-Specific Metrics**:
+  - Individual player statistics
+  - Win/loss ratios
+  - Playing patterns and preferences
+  - Session duration tracking
+
+### Local Setup for Kafka Analytics
+
+To run the analytics system locally:
+
+```bash
+# 1. Start Kafka (requires Apache Kafka installed)
+# Start Zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+# Start Kafka Server
+bin/kafka-server-start.sh config/server.properties
+
+# 2. Run the analytics consumer
+cd connect4-backend/analytics
+npm install
+npm start
+
+# 3. Start the main backend (with Kafka producer)
+cd ../
+npm start
+```
+
+### Analytics Dashboard (Local)
+
+The analytics consumer provides insights into:
+- Real-time game statistics
+- Player behavior patterns
+- System performance metrics
+- Historical game data analysis
+
+This decoupled architecture demonstrates modern microservices patterns and event-driven design, making the system scalable and maintainable for production environments.
 
 ## 📊 Database Schema
 
@@ -239,8 +305,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For any questions or issues, please contact:
-- **Email**: [your-email@example.com]
-- **GitHub**: [your-github-username]
+- **Email**: anshul8032@gmail.com
+- **GitHub**: https://github.com/AnshulMishra2003
 
 ---
 
