@@ -13,8 +13,8 @@ A real-time multiplayer Connect4 game built with React.js frontend and Node.js b
 
 ## 🚀 Live Demo
 
-🌐 **Frontend URL**: [Your Frontend URL Here]
-🌐 **Backend API**: [Your Backend URL Here]
+🌐 **Frontend URL**: https://4in-row-game-or-connect4-itwkty1xo.vercel.app/
+🌐 **Backend API**:  https://connect4-backend-ka4c.onrender.com
 
 ## 📁 Project Structure
 
@@ -73,7 +73,7 @@ Before running this application, make sure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone [your-github-repo-url]
+git clone https://github.com/AnshulMishra2003/4inRowGame-or-Connect4.git
 cd connect4-game
 ```
 
@@ -239,8 +239,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For any questions or issues, please contact:
-- **Email**: [your-email@example.com]
-- **GitHub**: [your-github-username]
+- **Email**: [anshul8032@gmail.com]
+- **GitHub**: [https://github.com/AnshulMishra2003]
 
 ---
 
