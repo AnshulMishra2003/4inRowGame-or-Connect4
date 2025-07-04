@@ -308,6 +308,4 @@ For any questions or issues, please contact:
 - **Email**: anshul8032@gmail.com
 - **GitHub**: https://github.com/AnshulMishra2003
 
----
 
-**Made with ❤️ using React.js and Node.js**
