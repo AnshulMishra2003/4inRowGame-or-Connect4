@@ -29,6 +29,24 @@ const startServer = async () => {
     res.send("Connect 4 API running");
   });
 
+  // Health check endpoint for faster response
+  app.get("/health", (req, res) => {
+    res.status(200).json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  });
+
+  // Wake up endpoint
+  app.get("/wake", (req, res) => {
+    console.log("🚀 Wake up request received");
+    res.status(200).json({ 
+      message: "Server is awake", 
+      timestamp: new Date().toISOString() 
+    });
+  });
+
   server.listen(PORT, () => {
     console.log(`✅ Server running on http://localhost:${PORT}`);
   });

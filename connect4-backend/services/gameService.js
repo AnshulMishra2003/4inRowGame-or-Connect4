@@ -90,9 +90,12 @@ const GameService = {
       board: game.board,
     });
 
-    if (checkWinner(game.board, symbol)) {
+    const winResult = checkWinner(game.board, symbol);
+    if (winResult.isWinner) {
       io.to(gameId).emit("gameOver", {
         winner: socket.username,
+        board: game.board,
+        winningPositions: winResult.winningPositions, // Include winning positions
       });
       await sendGameEvent("gameOver", {
         winner: socket.username,
@@ -109,6 +112,7 @@ const GameService = {
       io.to(gameId).emit("gameOver", {
         winner: null,
         draw: true,
+        board: game.board, // Include final board state
       });
       
       await sendGameEvent("gameOver", {

@@ -19,6 +19,7 @@ module.exports = function checkWinner(board, symbol) {
         let count = 1;
         let nr = r + dr;
         let nc = c + dc;
+        let winningPositions = [[r, c]]; // Start with the current position
 
         while (
           nr >= 0 &&
@@ -28,7 +29,10 @@ module.exports = function checkWinner(board, symbol) {
           board[nr][nc] === symbol
         ) {
           count++;
-          if (count === 4) return true;
+          winningPositions.push([nr, nc]);
+          if (count === 4) {
+            return { isWinner: true, winningPositions };
+          }
           nr += dr;
           nc += dc;
         }
@@ -36,5 +40,5 @@ module.exports = function checkWinner(board, symbol) {
     }
   }
 
-  return false;
+  return { isWinner: false, winningPositions: [] };
 };
