@@ -1,60 +1,115 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import socket from "../socket";
+import { getSocket } from "../socket";
+import useRateLimiting from "../hooks/useRateLimiting";
 
 const Lobby = () => {
   const [name, setName] = useState("");
   const [joined, setJoined] = useState(false);
   const [error, setError] = useState("");
+  const [connectionError, setConnectionError] = useState(false);
+  const { isRateLimited, remainingTime } = useRateLimiting();
   const navigate = useNavigate();
 
-  const joinGame = () => {
+  const joinGame = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
       setError("Please enter your name.");
       return;
     }
     if (joined) return;
+    
+    // Don't attempt to join if rate limited
+    if (isRateLimited) {
+      setError(`Server is rate limited. Please wait ${remainingTime} seconds before trying again.`);
+      return;
+    }
 
     const cleanedName = trimmed; // keep original case
 
-    const emitJoin = () => {
+    try {
+      const socket = await getSocket();
       console.log("🔗 Emitting joinGame:", cleanedName);
       socket.emit("joinGame", cleanedName);
       setJoined(true);
       setError("");
-    };
-
-    if (socket.connected) {
-      emitJoin();
-    } else {
-      socket.once("connect", emitJoin);
+      setConnectionError(false);
+    } catch (error) {
+      console.error("Failed to join game:", error);
+      
+      // Check if error is rate limiting related
+      if (error.message && (
+          error.message.includes('429') || 
+          error.message.includes('Too Many Requests') ||
+          error.message.toLowerCase().includes('rate limit')
+      )) {
+        setError(`Too Many Requests (429). Please wait ${remainingTime || 60} seconds before trying again.`);
+      } else {
+        setError("Failed to connect to server. Please try again.");
+        setConnectionError(true);
+      }
+      
+      setJoined(false);
     }
   };
 
   useEffect(() => {
-    const handleGameStarted = ({ gameId, players, turn }) => {
-      console.log("✅ Game started with ID:", gameId, "Players:", players, "Turn:", turn);
+    const initializeLobbySocket = async () => {
+      const handleGameStarted = ({ gameId, players, turn }) => {
+        console.log("✅ Game started with ID:", gameId, "Players:", players, "Turn:", turn);
 
-      const cleanedName = name.trim();
-      const opponent = players.find((p) => p !== cleanedName) || "BotMaster";
+        const cleanedName = name.trim();
+        const opponent = players.find((p) => p !== cleanedName) || "BotMaster";
 
-      navigate(`/game/${gameId}`, {
-        state: {
-          username: cleanedName,
-          gameId,
-          opponent,
-          turn: turn, // keep original case
-        },
-      });
+        navigate(`/game/${gameId}`, {
+          state: {
+            username: cleanedName,
+            gameId,
+            opponent,
+            turn: turn, // keep original case
+          },
+        });
+      };
+
+      try {
+        // Check for rate limiting before attempting to get socket
+        if (isRateLimited) {
+          console.log(`⚠️ Rate limited. Waiting ${remainingTime}s before connecting socket.`);
+          setError(`Server is rate limited. Please wait ${remainingTime} seconds.`);
+          return () => {}; // Empty cleanup function
+        }
+        
+        const socket = await getSocket();
+        socket.on("gameStarted", handleGameStarted);
+        
+        // Reset connection error if successful
+        setConnectionError(false);
+        
+        return () => {
+          socket.off("gameStarted", handleGameStarted);
+        };
+      } catch (error) {
+        console.error("Failed to initialize lobby socket:", error);
+        
+        // Check if error is rate limiting related
+        if (error.message && (
+            error.message.includes('429') || 
+            error.message.includes('Too Many Requests') ||
+            error.message.toLowerCase().includes('rate limit')
+        )) {
+          setError(`Too Many Requests (429). Please wait before trying again.`);
+        } else {
+          setConnectionError(true);
+        }
+      }
     };
 
-    socket.on("gameStarted", handleGameStarted);
-
+    const cleanup = initializeLobbySocket();
+    
     return () => {
-      socket.off("gameStarted", handleGameStarted);
+      cleanup.then(cleanupFn => cleanupFn && cleanupFn()).catch(console.error);
     };
-  }, [name, navigate]);
+  }, [name, navigate, isRateLimited, remainingTime]);
 
   return (
     <div
@@ -152,6 +207,37 @@ const Lobby = () => {
           spellCheck="false"
         />
         {error && <p style={{ color: "#ff6b6b", marginBottom: "20px", fontSize: "16px" }}>{error}</p>}
+        {connectionError && (
+          <div style={{ 
+            padding: "12px 15px", 
+            backgroundColor: "#ffdddd", 
+            borderRadius: "10px", 
+            marginBottom: "20px",
+            color: "#d8000c",
+            fontSize: "14px",
+            textAlign: "center",
+            width: "80%",
+            maxWidth: "400px"
+          }}>
+            <strong>Connection Error:</strong> Unable to reach the game server. Please check your internet connection and try again.
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                display: "block",
+                margin: "10px auto 0",
+                padding: "6px 12px",
+                fontSize: "14px",
+                backgroundColor: "#d8000c",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Reload Page
+            </button>
+          </div>
+        )}
         <button
           onClick={joinGame}
           disabled={joined}
