@@ -13,7 +13,7 @@ A real-time multiplayer Connect4 game built with React.js frontend and Node.js b
 
 ## 🚀 Live Demo
 
- 🌐 **Frontend URL**: [https://4in-row-game-or-connect4.vercel.app/](https://4in-row-game-or-connect4.vercel.app/))  
+ 🌐 **Frontend URL**: [https://4in-row-game-or-connect4.vercel.app/](https://4in-row-game-or-connect4.vercel.app/)
  🌐 **Backend API**: [https://connect4-backend-ka4c.onrender.com](https://connect4-backend-ka4c.onrender.com)
 
 ## 📁 Project Structure
